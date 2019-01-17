@@ -56,6 +56,7 @@ public class Application {
     }
 
     public void run(InputStream filestream) {
+        boolean sent = false;
         try (PDDocument pdfDocument = PDDocument.load(filestream)) {
             ObjectExtractor extractor = new ObjectExtractor(pdfDocument);
             SpreadsheetExtractionAlgorithm algorithm = new SpreadsheetExtractionAlgorithm();
@@ -68,9 +69,10 @@ public class Application {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        logger.warning(sent ? "Mail sent." : " No Mail sent.");
     }
 
-    private void check(Table table) {
+    private boolean check(Table table) {
         logger.info(() -> "Check Table " + table + "...");
         logger.info(() -> "   Column number: " + table.getColCount());
         boolean sent = false;
@@ -84,7 +86,7 @@ public class Application {
                     sent |= sendMail(row.get(1).getText(), row.get(2).getText());
             }
         logger.info(() -> "   ...done.");
-        logger.warning(sent ? "Mail sent." : " No Mail sent.");
+        return sent;
     }
 
     private boolean sendMail(String documents, String date) {
