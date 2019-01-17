@@ -73,6 +73,7 @@ public class Application {
     private void check(Table table) {
         logger.info(() -> "Check Table " + table + "...");
         logger.info(() -> "   Column number: " + table.getColCount());
+        boolean sent = false;
         if (table.getColCount() == 3)
             for (List<RectangularTextContainer> row : table.getRows()) {
                 logger.info(() -> "      Checking row: " + row.toString().replaceAll("\\r", "\n"));
@@ -80,12 +81,13 @@ public class Application {
                 boolean containsNumber = visaText.contains(visaNumber);
                 logger.info(() -> "      Possible Visa #: " + visaText.replaceAll("\\r", "\n") + " -> " + containsNumber);
                 if (containsNumber)
-                    sendMail(row.get(1).getText(), row.get(2).getText());
+                    sent |= sendMail(row.get(1).getText(), row.get(2).getText());
             }
         logger.info(() -> "   ...done.");
+        logger.warning(sent ? "Mail sent." : " No Mail sent.");
     }
 
-    private void sendMail(String documents, String date) {
+    private boolean sendMail(String documents, String date) {
         logger.info(() -> ("   ----> Sending Mail... [" + documents + ", " + date + "]").replaceAll("\\r", "\n"));
         try {
             Properties properties = System.getProperties();
@@ -103,6 +105,7 @@ public class Application {
                     "\n" +
                     "\nYour private visa checker.", "UTF-8");
             Transport.send(message);
+            return true;
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
