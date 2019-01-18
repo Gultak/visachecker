@@ -28,7 +28,7 @@ public class Application {
 
     private static final String visaNumberIra = "1901243"; //"1901406";
 
-    private static final String targetEmail = "visa@gultak.de;test@gultak.de";
+    private static final String[] targetEmail = {"visa@gultak.de", "test@gultak.de"};
 
     private final String visaNumber;
 
@@ -97,7 +97,8 @@ public class Application {
             Session session = Session.getDefaultInstance(properties);
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress("visa@gultak.de"));
-            message.addRecipient(Message.RecipientType.TO, new InternetAddress(targetEmail));
+            for(String address : targetEmail)
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(address));
             message.setSubject("Visa #" + visaNumber + " is ready to pickup!", "ISO-8859-1");
             message.setText("Hi,\n\nYour visa application is ready." +
                     "\nThe visa should be picked up till " + date +
