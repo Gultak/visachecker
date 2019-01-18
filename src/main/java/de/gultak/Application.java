@@ -64,7 +64,7 @@ public class Application {
             while (pages.hasNext()) {
                 Page page = pages.next();
                 for (Table table : algorithm.extract(page))
-                    check(table);
+                    sent |= check(table);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
