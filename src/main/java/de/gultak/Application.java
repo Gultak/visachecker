@@ -26,9 +26,9 @@ public class Application {
 
     private static final String visaURL = "https://kiew.diplo.de/blob/1350604/2a61a4399c8a3e3a686419ad5a6797b4/pdf-abholbereite-visa-neu-data.pdf";
 
-    private static final String visaNumberIra = "1901243"; //"1901406";
+    private static final String visaNumberIra = "1901406";
 
-    private static final String[] targetEmail = {"visa@gultak.de", "test@gultak.de"};
+    private static final String[] targetEmail = {"visa@gultak.de", "vlasneira@gmail.com"};
 
     private final String visaNumber;
 
