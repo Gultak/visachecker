@@ -16,6 +16,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Hello world!
@@ -57,19 +59,31 @@ public class Application {
 
     public void run(InputStream filestream) {
         boolean sent = false;
+        String date = null;
         try (PDDocument pdfDocument = PDDocument.load(filestream)) {
             ObjectExtractor extractor = new ObjectExtractor(pdfDocument);
             SpreadsheetExtractionAlgorithm algorithm = new SpreadsheetExtractionAlgorithm();
             PageIterator pages = extractor.extract();
             while (pages.hasNext()) {
                 Page page = pages.next();
+                date = (date == null ? extractDate(page) : date);
                 for (Table table : algorithm.extract(page))
                     sent |= check(table);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        logger.warning(sent ? "Mail sent." : " No Mail sent.");
+        logger.warning("Date: " + date + " --> " + (sent ? "Mail sent." : " No Mail sent."));
+    }
+
+    private String extractDate(Page page) {
+         for(TextElement element : page.getText()) {
+             Pattern pattern = Pattern.compile(".*Stand/.+(\\d{2}\\.\\d{2}\\.\\d{4})\\:");
+             Matcher matcher = pattern.matcher(element.getText());
+             if(matcher.matches())
+                 return matcher.group(1);
+         }
+         return null;
     }
 
     private boolean check(Table table) {
