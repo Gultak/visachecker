@@ -76,14 +76,20 @@ public class Application {
         logger.warning("Date: " + date + " --> " + (sent ? "Mail sent." : " No Mail sent."));
     }
 
+    static final Pattern pattern = Pattern.compile(".*Stand/.+(\\d{2}\\.\\d{2}\\.\\d{4})\\:.*");
+
     private String extractDate(Page page) {
-         for(TextElement element : page.getText()) {
-             Pattern pattern = Pattern.compile(".*Stand/.+(\\d{2}\\.\\d{2}\\.\\d{4})\\:");
-             Matcher matcher = pattern.matcher(element.getText());
-             if(matcher.matches())
-                 return matcher.group(1);
-         }
-         return null;
+        logger.info(() -> "Extracting date from page #" + page.getPageNumber());
+        StringBuilder pageContent = new StringBuilder();
+        page.getText().forEach((element) -> pageContent.append(element.getText()));
+        logger.info(() -> "   ---> Parsing... [" + pageContent + "]");
+        Matcher matcher = pattern.matcher(pageContent.toString());
+        logger.info(() -> "   ---> Result... [" + matcher + "]");
+        if (matcher.matches()) {
+            logger.info(() -> "   <--- Match found: [" + matcher + "]");
+            return matcher.group(1);
+        }
+        return null;
     }
 
     private boolean check(Table table) {
@@ -111,7 +117,7 @@ public class Application {
             Session session = Session.getDefaultInstance(properties);
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress("visa@gultak.de"));
-            for(String address : targetEmail)
+            for (String address : targetEmail)
                 message.addRecipient(Message.RecipientType.TO, new InternetAddress(address));
             message.setSubject("Visa #" + visaNumber + " is ready to pickup!", "ISO-8859-1");
             message.setText("Hi,\n\nYour visa application is ready." +
